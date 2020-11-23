@@ -3,7 +3,7 @@
     <div class="is-flex is-justify-content-center">
       <b-icon class="footer-icon has-text-white" icon="television" />
 
-      <p class="has-text-light">
+      <p class="has-text-white">
         <strong class="has-text-white">App Series</strong> by Anderson Barros
       </p>
     </div>

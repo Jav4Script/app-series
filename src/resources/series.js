@@ -4,7 +4,7 @@ export const filterSeries = filters => {
   let params = '?';
   if (filters) {
     if (filters.imdbId) {
-      params += `imdbId=${filters.imdbId}`;
+      params += `imdbId=${filters.imdbId}&`;
     }
     if (filters.name) {
       params += `name=${filters.name}&`;
@@ -21,3 +21,4 @@ export const filterSeries = filters => {
 };
 
 export const fetchMySeries = () => api.get('/my-series');
+export const fetchSerieById = imdbId => api.get(`/series/${imdbId}`);
