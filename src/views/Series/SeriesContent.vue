@@ -8,18 +8,67 @@
           </header>
 
           <div class="has-text-centered">
-            <p class="custom-content">
+            <p class="m-3">
               <strong>{{ serie.Title }}</strong>
             </p>
 
-            <p class="custom-content">
+            <p class="mb-3">
               {{ formatSeasons(serie.Year) }}
             </p>
 
-            <b-taglist attached class="custom-content is-justify-content-center">
-              <b-tag class="custom-tag" type="is-info">IMDb ID</b-tag>
-              <b-tag class="custom-tag" type="is-dark">{{ serie.imdbID }}</b-tag>
-            </b-taglist>
+            <div class="mb-3">
+              <b-collapse
+                aria-id="contentIdForA11y1"
+                class="is-justify-content-center"
+                ref="details"
+                :open="false"
+              >
+                <a
+                  aria-controls="contentIdForA11y1"
+                  slot="trigger"
+                  @click.prevent="getSerieById(serie.imdbID, serie.Plot)"
+                  >Detalhes</a
+                >
+                <div class="notification custom-notification">
+                  <div v-if="!loading.series" class="content">
+                    <div class="mb-3">
+                      <span>{{
+                        `${serie.totalSeasons} ${
+                          serie.totalSeasons > 1 ? 'temporadas' : 'temporada'
+                        }`
+                      }}</span>
+                    </div>
+
+                    <div class="mb-3 category-container">
+                      <span>{{ `${serie.Genre} (${serie.Released})` }}</span>
+                    </div>
+
+                    <div class="mb-3 imdb-rating">
+                      <b-icon
+                        class="mr-1 custom-icon-imdb-rating"
+                        icon="star"
+                        type="is-warning"
+                      ></b-icon>
+                      <strong>{{ serie.imdbRating }}</strong>
+                    </div>
+
+                    <b-taglist attached class="mb-4 is-justify-content-center">
+                      <b-tag class="custom-tag" type="is-info">IMDb ID</b-tag>
+                      <b-tag class="custom-tag" type="is-dark">{{ serie.imdbID }}</b-tag>
+                    </b-taglist>
+
+                    <div class="mb-1">
+                      <b-button
+                        outlined
+                        type="is-dark"
+                        @click.prevent="[(synopsisText = serie.Plot), (openSynopsis = true)]"
+                        >Ver Sinopse</b-button
+                      >
+                    </div>
+                  </div>
+                </div>
+              </b-collapse>
+            </div>
           </div>
 
           <footer class="card-footer">
@@ -33,21 +82,41 @@
     <div v-else class="box has-text-centered empty-box">
       <div class="section"><p>Nenhuma série.</p></div>
     </div>
+
+    <b-modal :active.sync="openSynopsis" has-modal-card>
+      <App-Synopsis v-if="openSynopsis" :synopsis="synopsisText" />
+    </b-modal>
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapActions, mapState } from 'vuex';
+
+import AppSynopsis from '@/components/AppSynopsis';
 
 export default {
   name: 'SeriesContent',
+  components: {
+    AppSynopsis,
+  },
+  data() {
+    return {
+      openSynopsis: false,
+      synopsisText: '',
+    };
+  },
   computed: {
-    ...mapState('series', ['series']),
+    ...mapState('series', ['series', 'loading']),
   },
   methods: {
+    ...mapActions('series', ['fetchSerieById']),
     formatSeasons(seasons) {
       if (seasons.length < 6) return seasons.slice(0, 4);
       return seasons;
+    },
+    async getSerieById(imdbId, plot) {
+      if (plot) return;
+      await this.fetchSerieById(imdbId);
     },
   },
 };
@@ -78,10 +147,23 @@ export default {
 }
 
 .custom-card-container {
-  max-width: 25%;
+  max-width: 20%;
 }
 
 .custom-card-header {
   padding: 2rem;
+}
+
+.custom-icon-imdb-rating {
+  vertical-align: bottom;
+}
+
+.custom-notification {
+  font-size: 0.92rem;
+  margin-top: 1rem;
+}
+
+.details-button {
+  margin-bottom: 1rem;
 }
 </style>
