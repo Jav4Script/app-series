@@ -1,14 +1,17 @@
 <template>
   <div class="panel custom-panel">
-    <div class="panel-block" @keyup.enter.prevent="fetchSeries()">
+    <div
+      class="panel-block"
+      @keyup.enter.prevent="[($parent.filters.page = 1), filterSeries(filters)]"
+    >
       <b-field grouped class="field-grouped-container is-flex-touch is-flex-direction-column">
         <b-field expanded label="Nome">
-          <b-input v-model="filters.name" placeholder="Nome" />
+          <b-input v-model="$parent.filters.name" placeholder="Nome" />
         </b-field>
 
         <b-field label="Ano de Lançamento">
           <b-input
-            v-model="filters.released"
+            v-model="$parent.filters.released"
             placeholder="Ano de Lançamento"
             @keypress.native="allowedKeys($event)"
           />
@@ -21,15 +24,15 @@
               <b-icon size="is-small" icon="help-circle-outline"></b-icon>
             </b-tooltip>
           </template>
-          <b-input v-model="filters.imdbId" placeholder="IMDb válido" />
+          <b-input v-model="$parent.filters.imdbId" placeholder="IMDb válido" />
         </b-field>
 
         <b-field class="is-flex is-align-items-flex-end">
-          <b-button class="mr-2" type="is-primary" @click.stop.prevent="fetchSeries()">
+          <b-button class="mr-2" type="is-primary" @click.stop.prevent="checkFilters()">
             Filtrar
           </b-button>
 
-          <b-button type="is-primary" @click.stop.prevent="cleanFilters()">
+          <b-button type="is-primary" @click.stop.prevent="$parent.cleanFilters()">
             Limpar
           </b-button>
         </b-field>
@@ -43,22 +46,8 @@ import { mapActions } from 'vuex';
 
 export default {
   name: 'SeriesFilters',
-  data() {
-    const filters = {
-      imdbId: '',
-      name: '',
-      page: 1,
-      released: '',
-    };
-    const loading = {
-      clean: false,
-      filter: false,
-    };
-
-    return {
-      filters,
-      loading,
-    };
+  props: {
+    filters: { type: Object, default: () => {} },
   },
   methods: {
     ...mapActions('series', ['filterSeries']),
@@ -68,19 +57,18 @@ export default {
       }
       return event.preventDefault();
     },
-    async cleanFilters() {
-      Object.keys(this.filters).forEach(key => {
-        this.filters[key] = '';
-      });
-
-      this.loading.clean = true;
-      await this.filterSeries(this.filters);
-      this.loading.clean = false;
-    },
-    async fetchSeries() {
-      this.loading.filter = true;
-      await this.filterSeries(this.filters);
-      this.loading.filter = false;
+    checkFilters() {
+      if (this.filters.name || this.filters.imdbId) {
+        this.$parent.filters.page = 1;
+        filterSeries(filters);
+      } else {
+        this.$buefy.toast.open({
+          duration: 3000,
+          message: 'Insira nome ou IMDb ID',
+          position: 'is-top',
+          type: 'is-danger',
+        });
+      }
     },
   },
 };
