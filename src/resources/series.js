@@ -20,6 +20,8 @@ const mountParams = filters => {
   return params;
 };
 
+export const deleteMySerie = mySerieId => api.delete(`/my-series/${mySerieId}`);
+
 export const filterSeries = filters => {
   const params = mountParams(filters);
   return api.get(`/series${params}`);

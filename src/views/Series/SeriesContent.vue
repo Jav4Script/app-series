@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="content-component">
     <div v-if="series.length" class="is-flex is-flex-wrap-wrap">
       <div class="custom-card-container" v-for="serie in series" :key="serie.id" :value="serie.id">
         <div class="card m-3 custom-card">
@@ -88,25 +88,21 @@
           <footer class="card-footer" :class="{ 'decrease-font-size': displayFullCard }">
             <a
               class="card-footer-item custom-card-footer-seen"
-              @click.prevent.stop="
-                mountDataUpdate(serie.imdbId, { seen: !serie.seen, see: serie.see })
-              "
+              @click.prevent.stop="updateAndToast({ ...serie, seen: !serie.seen, see: serie.see })"
               >Já vi</a
             >
 
             <a
-              class="card-footer-item custom-card-footer-see"
-              @click.prevent.stop="
-                mountDataUpdate(serie.imdbId, { see: !serie.see, seen: serie.seen })
-              "
+              class="card-footer-item has-text-centered custom-card-footer-see"
+              @click.prevent.stop="updateAndToast({ ...serie, see: !serie.see, seen: serie.seen })"
               >Quero ver</a
             >
 
             <a
               v-if="displayFullCard"
-              class="card-footer-item custom-card-footer-delete"
+              class="card-footer-item has-text-centered custom-card-footer-delete"
               :class="{ ' is-loading': loading.delete }"
-              @click.prevent.stop="deleteSerie()"
+              @click.prevent.stop="deleteAndToast({ mySerieId: serie.id })"
               >Excluir</a
             >
           </footer>
@@ -116,6 +112,7 @@
 
     <div v-else class="box has-text-centered empty-box">
       <div class="section">
+        <b-icon icon="emoticon-outline"></b-icon>
         <p>{{ displayFullCard ? 'Nenhuma série adicionada' : 'Nenhuma série buscada.' }}</p>
       </div>
     </div>
@@ -150,9 +147,27 @@ export default {
     ...mapState('series', ['loading']),
   },
   methods: {
-    ...mapActions('series', ['fetchSerieById', 'updateMySeries']),
+    ...mapActions('series', ['deleteMySerie', 'fetchSerieById', 'updateMySeries']),
     checkPlot(imdbId, plot) {
       if (!plot) this.getSerieById(imdbId);
+    },
+    deleteAndToast(data) {
+      try {
+        this.deleteMySerie(data);
+        this.$buefy.toast.open({
+          duration: 1500,
+          message: 'Minha série excluída com sucesso',
+          position: 'is-bottom',
+          type: 'is-success',
+        });
+      } catch (error) {
+        this.$buefy.toast.open({
+          duration: 1500,
+          message: 'Ocorreu um erro ao excluir minha série',
+          position: 'is-bottom',
+          type: 'is-danger',
+        });
+      }
     },
     formatSeasons(seasons) {
       if (seasons.length < 6) return seasons.slice(0, 4);
@@ -162,16 +177,33 @@ export default {
       if (plot) return;
       await this.fetchSerieById(imdbId);
     },
-    async mountDataUpdate(imdbId, data) {
-      const serieDetails = await this.fetchSerieById(imdbId);
-      const serie = { ...serieDetails, ...data };
-      await this.updateMySeries(serie);
+    updateAndToast(data) {
+      try {
+        this.updateMySeries(data);
+        this.$buefy.toast.open({
+          duration: 1500,
+          message: 'Minha série atualizada com sucesso',
+          position: 'is-bottom',
+          type: 'is-success',
+        });
+      } catch (error) {
+        this.$buefy.toast.open({
+          duration: 1500,
+          message: 'Ocorreu um erro ao atualizar minha série',
+          position: 'is-bottom',
+          type: 'is-danger',
+        });
+      }
     },
   },
 };
 </script>
 
 <style lang="scss" scoped>
+.content-component {
+  margin-top: 0.5rem;
+}
+
 .custom-card {
   background-color: #ecececd7;
 }
@@ -192,7 +224,8 @@ export default {
 }
 
 .custom-card-footer-see:hover,
-.custom-card-footer-seen:hover {
+.custom-card-footer-seen:hover,
+.custom-card-footer-delete:hover {
   color: black;
 }
 
