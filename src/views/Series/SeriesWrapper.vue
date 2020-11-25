@@ -2,13 +2,7 @@
   <div class="series-wrapper-container">
     <b-loading is-full-page :active="triggerLoading" can-cancel></b-loading>
 
-    <!-- <section>
-      <div class="series-container">
-        <Series-Highlights />
-      </div>
-    </section> -->
-
-    <div class="container is-fullhd">
+    <div class="container is-fullhd flex-direction-column">
       <section>
         <div class="filters-container">
           <Series-Filters :filters.sync="filters" />

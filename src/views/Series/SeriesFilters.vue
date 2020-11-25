@@ -4,7 +4,7 @@
       class="panel-block"
       @keyup.enter.prevent="[($parent.filters.page = 1), filterSeries(filters)]"
     >
-      <b-field grouped class="field-grouped-container is-flex-touch is-flex-direction-column">
+      <b-field grouped class="field-grouped-container">
         <b-field expanded label="Nome">
           <b-input v-model="$parent.filters.name" placeholder="Nome" />
         </b-field>
@@ -27,7 +27,7 @@
           <b-input v-model="$parent.filters.imdbId" placeholder="IMDb válido" />
         </b-field>
 
-        <b-field class="is-flex is-align-items-flex-end">
+        <b-field class="is-flex is-align-items-flex-end buttons-container">
           <b-button class="mr-2" type="is-primary" @click.stop.prevent="checkFilters()">
             Filtrar
           </b-button>
@@ -85,5 +85,19 @@ export default {
 
 .field.is-grouped .field {
   flex-shrink: 1 !important;
+}
+</style>
+
+<style>
+@media (max-width: 768px) {
+  .field-grouped-container > .field-body > .field.is-grouped {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .field-grouped-container > .field-body > .field.is-grouped > .field {
+    justify-content: center;
+    margin: 0.5rem 0.5rem;
+  }
 }
 </style>

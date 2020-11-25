@@ -92,8 +92,8 @@ $link-focus-border: $primary;
 @import '~bulma';
 @import '~buefy/src/scss/buefy';
 
-@media (max-width: 1023px) {
-  .column-direction-touch {
+@media (max-width: 768px) {
+  .flex-direction-column-mobile {
     flex-direction: column;
   }
 }
