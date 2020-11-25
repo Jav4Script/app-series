@@ -11,7 +11,15 @@
 
       <section>
         <div class="content-container">
-          <Series-Content ref="content" />
+          <b-tabs position="is-centered" type="is-toggle-rounded">
+            <b-tab-item label="Séries" icon="television-box">
+              <Series-Content ref="content" :series="series" />
+            </b-tab-item>
+
+            <b-tab-item label="Minhas Séries" icon="youtube-tv">
+              <Series-Content ref="content" :series="mySeries" :display-full-card="true" />
+            </b-tab-item>
+          </b-tabs>
         </div>
       </section>
 
@@ -35,7 +43,6 @@ import AppPagination from '@/components/AppPagination';
 
 import SeriesContent from './SeriesContent';
 import SeriesFilters from './SeriesFilters';
-// import SeriesHighlights from './SeriesHighlights.vue';
 
 export default {
   name: 'SeriesWrapper',
@@ -43,7 +50,6 @@ export default {
     AppPagination,
     SeriesContent,
     SeriesFilters,
-    // SeriesHighlights,
   },
   data() {
     const filters = {
