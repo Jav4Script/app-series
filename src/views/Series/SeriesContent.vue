@@ -4,43 +4,57 @@
       <div class="custom-card-container" v-for="serie in series" :key="serie.id" :value="serie.id">
         <div class="card m-3 custom-card">
           <header class="card-header custom-card-header">
-            <b-image responsive :src="serie.Poster" :alt="serie.Title" :web="serie.Poster" />
+            <b-image responsive :src="serie.image" :alt="serie.name" :web="serie.image" />
           </header>
 
           <div class="has-text-centered">
+            <div v-if="displayFullCard" class="icons-container">
+              <b-icon
+                v-if="serie.seen"
+                class="custom-eye-off-icon"
+                icon="check"
+                type="is-info"
+              ></b-icon>
+
+              <b-icon
+                v-if="serie.see"
+                class="custom-eye-icon"
+                icon="eye"
+                type="is-success"
+              ></b-icon>
+            </div>
+
             <p class="m-3">
-              <strong>{{ serie.Title }}</strong>
+              <strong>{{ serie.name }}</strong>
             </p>
 
             <p class="mb-3">
-              {{ formatSeasons(serie.Year) }}
+              {{ serie.year ? formatSeasons(serie.year) : '' }}
             </p>
 
-            <div class="mb-3">
+            <div class="mb-5">
               <b-collapse
                 aria-id="contentIdForA11y1"
-                class="is-justify-content-center"
+                class="is-justify-content-center mb-3"
                 ref="details"
                 :open="false"
               >
                 <a
                   aria-controls="contentIdForA11y1"
                   slot="trigger"
-                  @click.prevent="getSerieById(serie.imdbID, serie.Plot)"
+                  @click.prevent="checkPlot(serie.imdbId, serie.synopsis)"
                   >Detalhes</a
                 >
                 <div class="notification custom-notification">
                   <div v-if="!loading.series" class="content">
                     <div class="mb-3">
                       <span>{{
-                        `${serie.totalSeasons} ${
-                          serie.totalSeasons > 1 ? 'temporadas' : 'temporada'
-                        }`
+                        `${serie.seasons} ${serie.seasons > 1 ? 'temporadas' : 'temporada'}`
                       }}</span>
                     </div>
 
                     <div class="mb-3 category-container">
-                      <span>{{ `${serie.Genre} (${serie.Released})` }}</span>
+                      <span>{{ `${serie.category} (${serie.released})` }}</span>
                     </div>
 
                     <div class="mb-3 imdb-rating">
@@ -54,14 +68,14 @@
 
                     <b-taglist attached class="mb-4 is-justify-content-center">
                       <b-tag class="custom-tag" type="is-info">IMDb ID</b-tag>
-                      <b-tag class="custom-tag" type="is-dark">{{ serie.imdbID }}</b-tag>
+                      <b-tag class="custom-tag" type="is-dark">{{ serie.imdbId }}</b-tag>
                     </b-taglist>
 
                     <div class="mb-1">
                       <b-button
                         outlined
                         type="is-dark"
-                        @click.prevent="[(synopsisText = serie.Plot), (openSynopsis = true)]"
+                        @click.prevent="[(synopsisText = serie.synopsis), (openSynopsis = true)]"
                         >Ver Sinopse</b-button
                       >
                     </div>
@@ -71,16 +85,39 @@
             </div>
           </div>
 
-          <footer class="card-footer">
-            <a class="card-footer-item custom-card-footer-seen">Já vi</a>
-            <a class="card-footer-item custom-card-footer-see">Quero ver</a>
+          <footer class="card-footer" :class="{ 'decrease-font-size': displayFullCard }">
+            <a
+              class="card-footer-item custom-card-footer-seen"
+              @click.prevent.stop="
+                mountDataUpdate(serie.imdbId, { seen: !serie.seen, see: serie.see })
+              "
+              >Já vi</a
+            >
+
+            <a
+              class="card-footer-item custom-card-footer-see"
+              @click.prevent.stop="
+                mountDataUpdate(serie.imdbId, { see: !serie.see, seen: serie.seen })
+              "
+              >Quero ver</a
+            >
+
+            <a
+              v-if="displayFullCard"
+              class="card-footer-item custom-card-footer-delete"
+              :class="{ ' is-loading': loading.delete }"
+              @click.prevent.stop="deleteSerie()"
+              >Excluir</a
+            >
           </footer>
         </div>
       </div>
     </div>
 
     <div v-else class="box has-text-centered empty-box">
-      <div class="section"><p>Nenhuma série.</p></div>
+      <div class="section">
+        <p>{{ displayFullCard ? 'Nenhuma série adicionada' : 'Nenhuma série buscada.' }}</p>
+      </div>
     </div>
 
     <b-modal :active.sync="openSynopsis" has-modal-card>
@@ -99,6 +136,10 @@ export default {
   components: {
     AppSynopsis,
   },
+  props: {
+    series: { type: Array, default: () => [] },
+    displayFullCard: { type: Boolean, default: false },
+  },
   data() {
     return {
       openSynopsis: false,
@@ -106,10 +147,13 @@ export default {
     };
   },
   computed: {
-    ...mapState('series', ['series', 'loading']),
+    ...mapState('series', ['loading']),
   },
   methods: {
-    ...mapActions('series', ['fetchSerieById']),
+    ...mapActions('series', ['fetchSerieById', 'updateMySeries']),
+    checkPlot(imdbId, plot) {
+      if (!plot) this.getSerieById(imdbId);
+    },
     formatSeasons(seasons) {
       if (seasons.length < 6) return seasons.slice(0, 4);
       return seasons;
@@ -117,6 +161,11 @@ export default {
     async getSerieById(imdbId, plot) {
       if (plot) return;
       await this.fetchSerieById(imdbId);
+    },
+    async mountDataUpdate(imdbId, data) {
+      const serieDetails = await this.fetchSerieById(imdbId);
+      const serie = { ...serieDetails, ...data };
+      await this.updateMySeries(serie);
     },
   },
 };
@@ -127,14 +176,19 @@ export default {
   background-color: #ecececd7;
 }
 
-.custom-card-footer-see {
+.custom-card-footer-delete {
+  background-color: #f14668;
   color: white;
+}
+
+.custom-card-footer-see {
   background-color: #48c774;
+  color: white;
 }
 
 .custom-card-footer-seen {
+  background-color: #167df0;
   color: white;
-  background-color: #f14668;
 }
 
 .custom-card-footer-see:hover,
@@ -151,7 +205,13 @@ export default {
 }
 
 .custom-card-header {
+  margin-top: 1rem;
   padding: 2rem;
+}
+
+.custom-eye-icon,
+.custom-eye-off-icon {
+  margin: 1rem 1rem 0.5rem;
 }
 
 .custom-icon-imdb-rating {
@@ -163,7 +223,25 @@ export default {
   margin-top: 1rem;
 }
 
-.details-button {
-  margin-bottom: 1rem;
+.decrease-font-size {
+  font-size: 0.92rem;
+}
+
+@media (min-width: 300px) and (max-width: 492px) {
+  .custom-card-container {
+    max-width: 100%;
+  }
+}
+
+@media (min-width: 493px) and (max-width: 768px) {
+  .custom-card-container {
+    max-width: 50%;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1023px) {
+  .custom-card-container {
+    max-width: 33%;
+  }
 }
 </style>
