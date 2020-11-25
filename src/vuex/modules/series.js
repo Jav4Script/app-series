@@ -1,12 +1,14 @@
 import Vue from 'vue';
 
-import { filterSeries, fetchMySeries, fetchSerieById } from '@/resources/series';
+import { filterSeries, filterMySeries, fetchSerieById, updateMySeries } from '@/resources/series';
 
 const types = {
   SERIES: 'SERIES',
   SERIES_COUNT: 'SERIES_COUNT',
   SERIES_LOADING: 'SERIES_LOADING',
   SERIES_MY: 'SERIES_MY',
+  SERIES_MY_COUNT: 'SERIES_MY_COUNT',
+  SERIES_MY_LOADING: 'SERIES_MY_LOADING',
 };
 
 const mutations = {
@@ -42,6 +44,12 @@ const mutations = {
       }
     }
   },
+  [types.SERIES_MY_COUNT](state, count) {
+    state.count.mySeries = count;
+  },
+  [types.SERIES_MY_LOADING](state, loading) {
+    state.loading.mySeries = loading;
+  },
 };
 
 const actions = {
@@ -53,18 +61,26 @@ const actions = {
     commit(types.SERIES_LOADING, false);
     return commit(types.SERIES, response.data);
   },
-  async fetchMySeries({ commit }, filters = {}) {
-    const { data: response } = await fetchMySeries(filters);
-    if (response.status !== 200) return Promise.reject(response.data);
-
-    return commit(types.SERIES, response.data);
+  async filterMySeries({ commit }, filters = {}) {
+    commit(types.SERIES_MY_LOADING, true);
+    const response = await filterMySeries(filters);
+    if (response.status !== 200) return Promise.reject(response.data.data);
+    commit(types.SERIES_MY_COUNT, response.count);
+    commit(types.SERIES_MY_LOADING, false);
+    return commit(types.SERIES_MY, response.data.data);
   },
   async fetchSerieById({ commit }, imdbId) {
     commit(types.SERIES_LOADING, true);
     const { data: response } = await fetchSerieById(imdbId);
     if (response.status !== 200) return Promise.reject(response.data);
     commit(types.SERIES_LOADING, false);
-    return commit(types.SERIES, response.data);
+    commit(types.SERIES, response.data);
+    return response.data;
+  },
+  async updateMySeries({ commit }, data) {
+    const response = await updateMySeries(data);
+    if (response.status !== 201) return Promise.reject(response);
+    return commit(types.SERIES_MY, response.data);
   },
 };
 

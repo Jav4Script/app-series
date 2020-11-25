@@ -1,6 +1,6 @@
 import api from './http';
 
-export const filterSeries = filters => {
+const mountParams = filters => {
   let params = '?';
   if (filters) {
     if (filters.imdbId) {
@@ -17,8 +17,17 @@ export const filterSeries = filters => {
     }
   }
 
+  return params;
+};
+
+export const filterSeries = filters => {
+  const params = mountParams(filters);
   return api.get(`/series${params}`);
 };
 
-export const fetchMySeries = () => api.get('/my-series');
+export const filterMySeries = filters => {
+  const params = mountParams(filters);
+  return api.get(`/my-series${params}`);
+};
 export const fetchSerieById = imdbId => api.get(`/series/${imdbId}`);
+export const updateMySeries = data => api.patch(`/my-series`, data);

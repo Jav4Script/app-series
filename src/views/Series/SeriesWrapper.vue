@@ -58,13 +58,13 @@ export default {
     };
   },
   computed: {
-    ...mapState('series', ['count', 'loading']),
+    ...mapState('series', ['count', 'loading', 'series', 'mySeries']),
     triggerLoading() {
       return this.loading.series || this.loading.mySeries;
     },
   },
   methods: {
-    ...mapActions('series', ['filterSeries']),
+    ...mapActions('series', ['filterMySeries', 'filterSeries']),
     changePage(page) {
       this.filters.page = page;
       this.$refs.content.$refs.details.forEach(component => {
@@ -79,6 +79,9 @@ export default {
         }
       });
     },
+  },
+  async created() {
+    await this.filterMySeries(this.filters);
   },
 };
 </script>
