@@ -4,15 +4,19 @@
       <b-field grouped class="field-grouped-container">
         <b-field expanded label="Nome">
           <b-input
-            v-model="$parent[mySeriesRendered ? 'myFilters' : 'filters'].name"
             placeholder="Nome"
+            :value="filterName"
+            @input="value => $emit(`${mySeriesRendered ? 'myFilters' : 'filters'}Name`, value)"
           />
         </b-field>
 
         <b-field label="Ano de Lançamento">
           <b-input
-            v-model="$parent[mySeriesRendered ? 'myFilters' : 'filters'].released"
             placeholder="Ano de Lançamento"
+            maxlength="4"
+            :has-counter="false"
+            :value="filterReleased"
+            @input="value => $emit(`${mySeriesRendered ? 'myFilters' : 'filters'}Released`, value)"
             @keypress.native="allowedKeys($event)"
           />
         </b-field>
@@ -25,8 +29,9 @@
             </b-tooltip>
           </template>
           <b-input
-            v-model="$parent[mySeriesRendered ? 'myFilters' : 'filters'].imdbId"
             placeholder="IMDb válido"
+            :value="filterImdb"
+            @input="value => $emit(`${mySeriesRendered ? 'myFilters' : 'filters'}ImdbId`, value)"
           />
         </b-field>
 
@@ -56,6 +61,17 @@ export default {
     myFilters: { type: Object, default: () => {} },
     mySeriesRendered: { type: Boolean, default: false },
   },
+  computed: {
+    filterName() {
+      return this.mySeriesRendered ? this.myFilters.name : this.filters.name;
+    },
+    filterReleased() {
+      return this.mySeriesRendered ? this.myFilters.released : this.filters.released;
+    },
+    filterImdb() {
+      return this.mySeriesRendered ? this.myFilters.imdbId : this.filters.imdbId;
+    },
+  },
   methods: {
     ...mapActions('series', ['filterMySeries', 'filterSeries']),
     allowedKeys(event) {
@@ -65,7 +81,7 @@ export default {
       return event.preventDefault();
     },
     checkFilters() {
-      if (!this.filters.name && !this.filters.imdb) {
+      if (!this.filterName && !this.filterImdb) {
         this.$buefy.toast.open({
           duration: 3000,
           message: 'Insira nome ou IMDb ID',

@@ -113,7 +113,7 @@
     <div v-else class="box has-text-centered empty-box">
       <div class="section">
         <b-icon icon="emoticon-outline"></b-icon>
-        <p>{{ displayFullCard ? 'Nenhuma série adicionada' : 'Nenhuma série buscada.' }}</p>
+        <p>Nenhuma série.</p>
       </div>
     </div>
 
@@ -151,9 +151,9 @@ export default {
     checkPlot(imdbId, plot) {
       if (!plot) this.getSerieById(imdbId);
     },
-    deleteAndToast(data) {
+    async deleteAndToast(data) {
       try {
-        this.deleteMySerie(data);
+        await this.deleteMySerie(data);
         this.$buefy.toast.open({
           duration: 1500,
           message: 'Minha série excluída com sucesso',
@@ -179,9 +179,9 @@ export default {
       if (plot) return;
       await this.fetchSerieById(imdbId);
     },
-    updateAndToast(data) {
+    async updateAndToast(data) {
       try {
-        this.updateMySeries(data);
+        await this.updateMySeries(data);
         this.$buefy.toast.open({
           duration: 1500,
           message: 'Minha série atualizada com sucesso',

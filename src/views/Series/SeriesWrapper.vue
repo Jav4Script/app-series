@@ -8,9 +8,15 @@
           <Series-Filters
             :change-page="changePage"
             :clean-filters="cleanFilters"
-            :filters.sync="filters"
-            :my-filters.sync="myFilters"
+            :filters="filters"
+            :my-filters="myFilters"
             :my-series-rendered="mySeriesRendered"
+            @myFiltersName="name => (myFilters.name = name)"
+            @myFiltersReleased="released => (myFilters.released = released)"
+            @myFiltersImdbId="imdbId => (myFilters.imdbId = imdbId)"
+            @filtersName="name => (filters.name = name)"
+            @filtersReleased="released => (filters.released = released)"
+            @filtersImdbId="imdbId => (filters.imdbId = imdbId)"
           />
         </div>
       </section>
