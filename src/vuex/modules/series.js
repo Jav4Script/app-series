@@ -13,25 +13,24 @@ const types = {
   SERIES_COUNT: 'SERIES_COUNT',
   SERIES_FIRST_CHARGE: 'SERIES_FIRST_CHARGE',
   SERIES_LOADING: 'SERIES_LOADING',
+  SERIES_UPDATE: 'SERIES_UPDATE',
   SERIES_MY: 'SERIES_MY',
   SERIES_MY_COUNT: 'SERIES_MY_COUNT',
   SERIES_MY_DELETE: 'SERIES_MY_DELETE',
   SERIES_MY_FIRST_CHARGE: 'SERIES_MY_FIRST_CHARGE',
   SERIES_MY_LOADING: 'SERIES_MY_LOADING',
+  SERIES_MY_UPDATE: 'SERIES_MY_UPDATE',
 };
 
 const mutations = {
   [types.SERIES](state, data) {
     if (data && Array.isArray(data)) {
       state.series = data;
-    } else if (data && typeof data === 'object') {
-      const index = state.series.findIndex(serie => serie.imdbID === data.imdbID);
-      if (index > -1) {
-        const newObject = Object.assign(state.series[index], data);
-        Vue.set(state.series, index, newObject);
-      } else {
-        state.series.push(data);
-      }
+    } else if (data && typeof data === 'object' && Object.keys(data).length) {
+      state.series = [];
+      state.series.push(data);
+    } else {
+      state.series = [];
     }
 
     const parsed = JSON.stringify(state.series);
@@ -51,19 +50,27 @@ const mutations = {
   [types.SERIES_LOADING](state, loading) {
     state.loading.series = loading;
   },
+  [types.SERIES_UPDATE](state, data) {
+    if (data && Array.isArray(data)) {
+      state.series = data;
+    } else if (data && typeof data === 'object') {
+      const index = state.series.findIndex(serie => serie.imdbID === data.imdbID);
+      if (index > -1) {
+        const newObject = Object.assign(state.series[index], data);
+        Vue.set(state.series, index, newObject);
+      } else {
+        state.series.push(data);
+      }
+    }
+
+    const parsed = JSON.stringify(state.series);
+    localStorage.setItem('series', parsed);
+  },
   [types.SERIES_MY](state, data) {
     if (data && Array.isArray(data)) {
       state.mySeries = data;
     } else if (data && typeof data === 'object') {
-      const index = state.mySeries.findIndex(serie => serie.id === data.id);
-      if (index > -1) {
-        const newObject = Object.assign(state.mySeries[index], data);
-        Vue.set(state.mySeries, index, newObject);
-      } else {
-        state.mySeries.unshift(data);
-        const mySeriesCount = Number(localStorage.getItem('mySeriesCount')) + 1;
-        localStorage.setItem('mySeriesCount', mySeriesCount);
-      }
+      state.mySeries.unshift(data);
     }
 
     const parsed = JSON.stringify(state.mySeries);
@@ -91,6 +98,24 @@ const mutations = {
   },
   [types.SERIES_MY_LOADING](state, loading) {
     state.loading.mySeries = loading;
+  },
+  [types.SERIES_MY_UPDATE](state, data) {
+    if (data && Array.isArray(data)) {
+      state.mySeries = data;
+    } else if (data && typeof data === 'object') {
+      const index = state.mySeries.findIndex(serie => serie.id === data.id);
+      if (index > -1) {
+        const newObject = Object.assign(state.mySeries[index], data);
+        Vue.set(state.mySeries, index, newObject);
+      } else {
+        state.mySeries.unshift(data);
+        const mySeriesCount = Number(localStorage.getItem('mySeriesCount')) + 1;
+        localStorage.setItem('mySeriesCount', mySeriesCount);
+      }
+    }
+
+    const parsed = JSON.stringify(state.mySeries);
+    localStorage.setItem('mySeries', parsed);
   },
 };
 
@@ -127,7 +152,7 @@ const actions = {
     const { data: response } = await fetchSerieById(imdbId);
     if (response.status !== 200) return Promise.reject(response.data);
     commit(types.SERIES_LOADING, false);
-    commit(types.SERIES, response.data);
+    commit(types.SERIES_UPDATE, response.data);
     return response.data;
   },
   async updateMySeries({ commit }, data) {
@@ -135,7 +160,7 @@ const actions = {
     const response = await updateMySeries(data);
     if (response.status !== 201) return Promise.reject(response);
     commit(types.SERIES_LOADING, false);
-    return commit(types.SERIES_MY, response.data);
+    return commit(types.SERIES_MY_UPDATE, response.data);
   },
 };
 
