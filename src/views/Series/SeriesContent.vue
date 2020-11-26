@@ -159,6 +159,7 @@ export default {
           message: 'Minha série excluída com sucesso',
           position: 'is-bottom',
           type: 'is-success',
+          queue: false,
         });
       } catch (error) {
         this.$buefy.toast.open({
@@ -166,6 +167,7 @@ export default {
           message: 'Ocorreu um erro ao excluir minha série',
           position: 'is-bottom',
           type: 'is-danger',
+          queue: false,
         });
       }
     },
@@ -185,6 +187,7 @@ export default {
           message: 'Minha série atualizada com sucesso',
           position: 'is-bottom',
           type: 'is-success',
+          queue: false,
         });
       } catch (error) {
         this.$buefy.toast.open({
@@ -192,6 +195,7 @@ export default {
           message: 'Ocorreu um erro ao atualizar minha série',
           position: 'is-bottom',
           type: 'is-danger',
+          queue: false,
         });
       }
     },
