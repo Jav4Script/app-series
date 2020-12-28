@@ -25,11 +25,11 @@
         <div class="content-container">
           <b-tabs v-model="tabItem" position="is-centered" type="is-toggle-rounded">
             <b-tab-item label="Séries" icon="television-box">
-              <Series-Content ref="content" :series="series" />
+              <Series-Content ref="seriescontent" :series="series" />
             </b-tab-item>
 
             <b-tab-item label="Minhas Séries" icon="youtube-tv">
-              <Series-Content ref="content" :series="mySeries" :display-full-card="true" />
+              <Series-Content ref="myseriescontent" :series="mySeries" :display-full-card="true" />
             </b-tab-item>
           </b-tabs>
         </div>
@@ -106,9 +106,13 @@ export default {
       this.setStorageFilters();
     },
     closeToggle() {
-      const childrenRefs = Object.keys(this.$refs.content.$refs);
+      const childrenRefs = Object.keys(
+        this.mySeriesRendered ? this.$refs.myseriescontent.$refs : this.$refs.seriescontent.$refs,
+      );
       if (childrenRefs.length) {
-        this.$refs.content.$refs.details.forEach(component => {
+        this.$refs[
+          this.mySeriesRendered ? 'myseriescontent' : 'seriescontent'
+        ].$refs.details.forEach(component => {
           if (component.isOpen) component.toggle();
         });
       }
