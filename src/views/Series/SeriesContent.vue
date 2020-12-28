@@ -3,7 +3,10 @@
     <div v-if="series.length" class="is-flex is-flex-wrap-wrap">
       <div class="custom-card-container" v-for="serie in series" :key="serie.id" :value="serie.id">
         <div class="card m-3 custom-card">
-          <header class="card-header custom-card-header">
+          <header
+            v-if="serie.image && serie.image !== 'N/A'"
+            class="card-header custom-card-header"
+          >
             <b-image responsive :src="serie.image" :alt="serie.name" :web="serie.image" />
           </header>
 
@@ -47,17 +50,26 @@
                 >
                 <div class="notification custom-notification">
                   <div v-if="!loading.series" class="content">
-                    <div class="mb-3">
+                    <div v-if="serie.seasons && serie.seasons !== 'N/A'" class="mb-3">
                       <span>{{
                         `${serie.seasons} ${serie.seasons > 1 ? 'temporadas' : 'temporada'}`
                       }}</span>
                     </div>
 
-                    <div class="mb-3 category-container">
+                    <div
+                      v-if="
+                        (serie.category || serie.released) &&
+                          (serie.category !== 'N/A' || serie.released !== 'N/A')
+                      "
+                      class="mb-3 category-container"
+                    >
                       <span>{{ `${serie.category} (${serie.released})` }}</span>
                     </div>
 
-                    <div class="mb-3 imdb-rating">
+                    <div
+                      v-if="serie.imdbRating && serie.imdbRating !== 'N/A'"
+                      class="mb-3 imdb-rating"
+                    >
                       <b-icon
                         class="mr-1 custom-icon-imdb-rating"
                         icon="star"
@@ -71,7 +83,7 @@
                       <b-tag class="custom-tag" type="is-dark">{{ serie.imdbId }}</b-tag>
                     </b-taglist>
 
-                    <div class="mb-1">
+                    <div v-if="serie.synopsis && serie.synopsis !== 'N/A'" class="mb-1">
                       <b-button
                         outlined
                         type="is-dark"
