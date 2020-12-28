@@ -156,7 +156,7 @@ export default {
         await this.deleteMySerie(data);
         this.$buefy.toast.open({
           duration: 1500,
-          message: 'Minha série excluída com sucesso',
+          message: 'Minha série excluída',
           position: 'is-bottom',
           type: 'is-success',
           queue: false,
@@ -164,7 +164,7 @@ export default {
       } catch (error) {
         this.$buefy.toast.open({
           duration: 1500,
-          message: 'Ocorreu um erro ao excluir minha série',
+          message: 'Erro ao excluir minha série',
           position: 'is-bottom',
           type: 'is-danger',
           queue: false,
@@ -184,7 +184,7 @@ export default {
         await this.updateMySeries(data);
         this.$buefy.toast.open({
           duration: 1500,
-          message: 'Minha série atualizada com sucesso',
+          message: 'Minha série atualizada',
           position: 'is-bottom',
           type: 'is-success',
           queue: false,
@@ -192,7 +192,7 @@ export default {
       } catch (error) {
         this.$buefy.toast.open({
           duration: 1500,
-          message: 'Ocorreu um erro ao atualizar minha série',
+          message: 'Erro ao atualizar minha série',
           position: 'is-bottom',
           type: 'is-danger',
           queue: false,
