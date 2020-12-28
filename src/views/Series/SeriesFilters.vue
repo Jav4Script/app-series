@@ -5,19 +5,9 @@
         <b-field expanded label="Nome">
           <b-input
             placeholder="Nome"
+            :disabled="Boolean(filterImdb)"
             :value="filterName"
             @input="value => $emit(`${mySeriesRendered ? 'myFilters' : 'filters'}Name`, value)"
-          />
-        </b-field>
-
-        <b-field label="Ano de Lançamento">
-          <b-input
-            placeholder="Ano de Lançamento"
-            maxlength="4"
-            :has-counter="false"
-            :value="filterReleased"
-            @input="value => $emit(`${mySeriesRendered ? 'myFilters' : 'filters'}Released`, value)"
-            @keypress.native="allowedKeys($event)"
           />
         </b-field>
 
@@ -30,8 +20,20 @@
           </template>
           <b-input
             placeholder="IMDb válido"
+            :disabled="Boolean(filterName)"
             :value="filterImdb"
             @input="value => $emit(`${mySeriesRendered ? 'myFilters' : 'filters'}ImdbId`, value)"
+          />
+        </b-field>
+
+        <b-field label="Ano de Lançamento">
+          <b-input
+            placeholder="Ano de Lançamento"
+            maxlength="4"
+            :has-counter="false"
+            :value="filterReleased"
+            @input="value => $emit(`${mySeriesRendered ? 'myFilters' : 'filters'}Released`, value)"
+            @keypress.native="allowedKeys($event)"
           />
         </b-field>
 
