@@ -54,7 +54,7 @@ const mutations = {
     if (data && Array.isArray(data)) {
       state.series = data;
     } else if (data && typeof data === 'object') {
-      const index = state.series.findIndex(serie => serie.imdbID === data.imdbID);
+      const index = state.series.findIndex(serie => serie.imdbId === data.imdbId);
       if (index > -1) {
         const newObject = Object.assign(state.series[index], data);
         Vue.set(state.series, index, newObject);
