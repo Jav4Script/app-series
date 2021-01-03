@@ -135,10 +135,10 @@ export default {
         this.filters = filterSeries;
       }
 
-      const filterMyseries = JSON.parse(localStorage.getItem('filterMySeries'));
-      if (filterMyseries) {
+      const filterMySeries = JSON.parse(localStorage.getItem('filterMySeries'));
+      if (filterMySeries) {
         filterMySeries.page = Number(filterMySeries.page);
-        this.myFilters = filterMyseries;
+        this.myFilters = filterMySeries;
       }
     },
     setStorageFilters() {
